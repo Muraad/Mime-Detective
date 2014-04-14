@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MimeDetective", "MimeDetective\MimeDetective.csproj", "{808E29FE-EF7A-4B04-858B-414238956BC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MimeDetectiveUI", "MimeDetectiveUI\MimeDetectiveUI.csproj", "{309658F5-662C-463B-B7CB-A173C29537D2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{808E29FE-EF7A-4B04-858B-414238956BC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{808E29FE-EF7A-4B04-858B-414238956BC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{808E29FE-EF7A-4B04-858B-414238956BC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{808E29FE-EF7A-4B04-858B-414238956BC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{309658F5-662C-463B-B7CB-A173C29537D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{309658F5-662C-463B-B7CB-A173C29537D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{309658F5-662C-463B-B7CB-A173C29537D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{309658F5-662C-463B-B7CB-A173C29537D2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
