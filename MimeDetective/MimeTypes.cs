@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-
 using System.Threading.Tasks;
 
 namespace MimeDetective
@@ -14,9 +14,9 @@ namespace MimeDetective
     {
 
         // all the file types to be put into one list
-        public static List<FileType> types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
+        public static List<FileType> types = new List<FileType> { PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
-                AES, SKR, SKR_2, PKR, EML_FROM, ELF};
+                AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE };
 
         #region Constants
 
@@ -25,11 +25,18 @@ namespace MimeDetective
         //mime types are taken from here:
         //http://www.webmaster-toolkit.com/mime-types.shtml
 
-        #region office, excel, ppt and cocuments, xml, pdf, rtf, msdoc
+        #region office, excel, ppt and documents, xml, pdf, rtf, msdoc
         // office and documents
         public readonly static FileType WORD = new FileType(new byte?[] { 0xEC, 0xA5, 0xC1, 0x00 }, 512, "doc", "application/msword");
         public readonly static FileType EXCEL = new FileType(new byte?[] { 0x09, 0x08, 0x10, 0x00, 0x00, 0x06, 0x05, 0x00 }, 512, "xls", "application/excel");
         public readonly static FileType PPT = new FileType(new byte?[] { 0xFD, 0xFF, 0xFF, 0xFF, null, 0x00, 0x00, 0x00 }, 512, "ppt", "application/mspowerpoint");
+
+        //ms office and openoffice docs (they're zip files: rename and enjoy!)
+        //don't add them to the list, as they will be 'subtypes' of the ZIP type
+        public readonly static FileType WORDX = new FileType(new byte?[0], 512, "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        public readonly static FileType EXCELX = new FileType(new byte?[0], 512, "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        public readonly static FileType ODT = new FileType(new byte?[0], 512, "odt", "application/vnd.oasis.opendocument.text");
+        public readonly static FileType ODS = new FileType(new byte?[0], 512, "ods", "application/vnd.oasis.opendocument.spreadsheet");
 
         // common documents
         public readonly static FileType RTF = new FileType(new byte?[] { 0x7B, 0x5C, 0x72, 0x74, 0x66, 0x31 }, "rtf", "application/rtf");
@@ -38,6 +45,14 @@ namespace MimeDetective
         //application/xml text/xml
         public readonly static FileType XML = new FileType(new byte?[] { 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x3D, 0x22, 0x31, 0x2E, 0x30, 0x22, 0x3F, 0x3E },
                                                             "xml,xul", "text/xml");
+
+        //text files
+        public readonly static FileType TXT = new FileType(new byte?[0], "txt", "text/plain");
+        public readonly static FileType TXT_UTF8 = new FileType(new byte?[] { 0xEF, 0xBB, 0xBF }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF16_BE = new FileType(new byte?[] { 0xFE, 0xFF }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF16_LE = new FileType(new byte?[] { 0xFF, 0xFE }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF32_BE = new FileType(new byte?[] { 0x00, 0x00, 0xFE, 0xFF }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF32_LE = new FileType(new byte?[] { 0xFF, 0xFE, 0x00, 0x00 }, "txt", "text/plain");
 
         #endregion
 
@@ -102,7 +117,7 @@ namespace MimeDetective
         #endregion
 
         public readonly static FileType LIB_COFF = new FileType(new byte?[] { 0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E, 0x0A }, "lib", "application/octet-stream");
- 
+
         #region Crypto aes, skr, skr_2, pkr
 
         //AES Crypt file format. (The fourth byte is the version number.)
@@ -117,7 +132,7 @@ namespace MimeDetective
         //PKR	 	PGP public keyring file
         public readonly static FileType PKR = new FileType(new byte?[] { 0x99, 0x01 }, "pkr", "application/octet-stream");
 
-        
+
         #endregion
 
         /*
@@ -330,7 +345,7 @@ namespace MimeDetective
         // number of bytes we read from a file
         private const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
 
-        
+
 
         #endregion
 
@@ -353,6 +368,65 @@ namespace MimeDetective
                 types = (List<FileType>)serializer.Deserialize(file);
             }
         }
+
+        /// <summary>
+        /// Read header of bytes and depending on the information in the header
+        /// return object FileType.
+        /// Return null in case when the file type is not identified. 
+        /// Throws Application exception if the file can not be read or does not exist
+        /// </summary>
+        /// <param name="file">The FileInfo object.</param>
+        /// <returns>FileType or null not identified</returns>
+        public static FileType GetFileType(this byte[] bytes)
+        {
+            var fileName = Path.GetTempFileName();
+
+            try
+            {
+                File.WriteAllBytes(fileName, bytes);
+                return GetFileType(new FileInfo(fileName));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                File.Delete(fileName);
+            }
+        }
+
+        /// <summary>
+        /// Read header of a stream and depending on the information in the header
+        /// return object FileType.
+        /// Return null in case when the file type is not identified. 
+        /// Throws Application exception if the file can not be read or does not exist
+        /// </summary>
+        /// <param name="file">The FileInfo object.</param>
+        /// <returns>FileType or null not identified</returns>
+        public static FileType GetFileType(this Stream stream)
+        {
+            var fileName = Path.GetTempFileName();
+
+            try
+            {
+                using (var fileStream = File.Create(fileName))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    stream.CopyTo(fileStream);
+                }
+                return GetFileType(new FileInfo(fileName));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                File.Delete(fileName);
+            }
+        }
+
         /// <summary>
         /// Read header of a file and depending on the information in the header
         /// return object FileType.
@@ -364,7 +438,14 @@ namespace MimeDetective
         public static FileType GetFileType(this FileInfo file)
         {
             // read first n-bytes from the file
-            Byte[] fileHeader = ReadFileHeader(file, MaxHeaderSize);
+            byte[] fileHeader = ReadFileHeader(file, MaxHeaderSize);
+
+            // checking if it's binary (not really exact, but should do the job)
+            // shouldn't work with UTF-16 OR UTF-32 files
+            if (!fileHeader.Any(b => b == 0))
+            {
+                return TXT;
+            }
 
             // compare the file header to the stored file headers
             foreach (FileType type in types)
@@ -387,6 +468,41 @@ namespace MimeDetective
                 }
                 if (matchingCount == type.Header.Length)
                 {
+                    //check for docx and xlsx
+                    if (type.Equals(ZIP))
+                    {
+                        using (var zipFile = ZipFile.OpenRead(file.FullName))
+                        {
+                            if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
+                            {
+                                return WORDX;
+                            }
+                            if (zipFile.Entries.Any(e => e.FullName.StartsWith("xl/")))
+                            {
+                                return EXCELX;
+                            }
+                            var ooMimeType = zipFile.Entries.FirstOrDefault(e => e.FullName == "mimetype");
+                            if (ooMimeType != null)
+                            {
+                                using (var textReader = new StreamReader(ooMimeType.Open()))
+                                {
+                                    var mimeType = textReader.ReadToEnd();
+                                    textReader.Close();
+
+                                    if (mimeType == ODT.Mime)
+                                    {
+                                        return ODT;
+                                    }
+
+                                    if (mimeType == ODS.Mime)
+                                    {
+                                        return ODS;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // if all the bytes match, return the type
                     return type;
                 }
@@ -400,12 +516,37 @@ namespace MimeDetective
         /// </summary>
         /// <param name="file">The file to work with</param>
         /// <returns>Array of bytes</returns>
-        private static Byte[] ReadFileHeader(FileInfo file, int MaxHeaderSize)
+        private static byte[] ReadFileHeader(FileInfo file, int MaxHeaderSize)
         {
-            Byte[] header = new byte[MaxHeaderSize];
+            byte[] header = new byte[MaxHeaderSize];
             try  // read file
             {
                 using (FileStream fsSource = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
+                {
+                    // read first symbols from file into array of bytes.
+                    fsSource.Read(header, 0, MaxHeaderSize);
+                }   // close the file stream
+
+            }
+            catch (Exception e) // file could not be found/read
+            {
+                throw new ApplicationException("Could not read file : " + e.Message);
+            }
+
+            return header;
+        }
+
+        /// <summary>
+        /// Reads the file header - first (16) bytes from the file
+        /// </summary>
+        /// <param name="file">The file to work with</param>
+        /// <returns>Array of bytes</returns>
+        private static byte[] ReadFileHeader(Stream stream, int MaxHeaderSize)
+        {
+            byte[] header = new byte[MaxHeaderSize];
+            try  // read file
+            {
+                using (var fsSource = new BinaryReader(stream))
                 {
                     // read first symbols from file into array of bytes.
                     fsSource.Read(header, 0, MaxHeaderSize);
