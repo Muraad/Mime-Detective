@@ -328,7 +328,7 @@ namespace MimeDetective
         */
 
         // number of bytes we read from a file
-        private const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
+        public const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
 
         
 
