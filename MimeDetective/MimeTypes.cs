@@ -353,6 +353,7 @@ namespace MimeDetective
                 types = (List<FileType>)serializer.Deserialize(file);
             }
         }
+
         /// <summary>
         /// Read header of a file and depending on the information in the header
         /// return object FileType.
@@ -364,7 +365,21 @@ namespace MimeDetective
         public static FileType GetFileType(this FileInfo file)
         {
             // read first n-bytes from the file
-            Byte[] fileHeader = ReadFileHeader(file, MaxHeaderSize);
+            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize));
+        }
+
+        /// <summary>
+        /// Read header of a file and depending on the information in the header
+        /// return object FileType.
+        /// Return null in case when the file type is not identified. 
+        /// Throws Application exception if the file can not be read or does not exist
+        /// </summary>
+        /// <param name="fileHeaderReadFunc">A function which returns the bytes found</param>
+        /// <returns>FileType or null not identified</returns>
+        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc)
+        {
+            // read first n-bytes from the file
+            Byte[] fileHeader = fileHeaderReadFunc();
 
             // compare the file header to the stored file headers
             foreach (FileType type in types)
