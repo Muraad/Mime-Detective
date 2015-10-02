@@ -14,9 +14,14 @@ namespace MimeDetective
     {
 
         // all the file types to be put into one list
-        public static List<FileType> types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
+        public static List<FileType> types;
+
+        static MimeTypes()
+        {
+            types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF};
+        }
 
         #region Constants
 
