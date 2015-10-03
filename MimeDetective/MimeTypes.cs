@@ -188,6 +188,13 @@ namespace MimeDetective
         /// Return null in case when the file type is not identified. 
         /// Throws Application exception if the file can not be read or does not exist
         /// </summary>
+        /// <remarks>
+        /// A temp file is written to get a FileInfo from the given bytes.
+        /// If this is not intended use 
+        /// 
+        ///     GetFileType(() => bytes); 
+        ///     
+        /// </remarks>
         /// <param name="file">The FileInfo object.</param>
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this byte[] bytes)
@@ -295,6 +302,62 @@ namespace MimeDetective
             return fileType;
         }
 
+        /// <summary>
+        /// Determines whether provided file belongs to one of the provided list of files
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <param name="requiredTypes">The required types.</param>
+        /// <returns>
+        ///   <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool isFileOfTypes(this FileInfo file, List<FileType> requiredTypes)
+        {
+            FileType currentType = file.GetFileType();
+
+            if (null == currentType)
+            {
+                return false;
+            }
+
+            return requiredTypes.Contains(currentType);
+        }
+
+        /// <summary>
+        /// Determines whether provided file belongs to one of the provided list of files,
+        /// where list of files provided by string with Comma-Separated-Values of extensions
+        /// </summary>
+        /// <param name="file">The file.</param>
+        /// <param name="requiredTypes">The required types.</param>
+        /// <returns>
+        ///   <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool isFileOfTypes(this FileInfo file, String CSV)
+        {
+            List<FileType> providedTypes = GetFileTypesByExtensions(CSV);
+
+            return file.isFileOfTypes(providedTypes);
+        }
+
+        /// <summary>
+        /// Gets the list of FileTypes based on list of extensions in Comma-Separated-Values string
+        /// </summary>
+        /// <param name="CSV">The CSV String with extensions</param>
+        /// <returns>List of FileTypes</returns>
+        private static List<FileType> GetFileTypesByExtensions(String CSV)
+        {
+            String[] extensions = CSV.ToUpper().Replace(" ", "").Split(',');
+
+            List<FileType> result = new List<FileType>();
+
+            foreach (FileType type in types)
+            {
+                if (extensions.Contains(type.Extension.ToUpper()))
+                {
+                    result.Add(type);
+                }
+            }
+            return result;
+        }
 
         private static FileType CheckForDocxAndXlsx(FileType type, string fileFullName)
         {
@@ -379,64 +442,6 @@ namespace MimeDetective
 
             return header;
         }
-
-        /// <summary>
-        /// Determines whether provided file belongs to one of the provided list of files
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="requiredTypes">The required types.</param>
-        /// <returns>
-        ///   <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool isFileOfTypes(this FileInfo file, List<FileType> requiredTypes)
-        {
-            FileType currentType = file.GetFileType();
-
-            if (null == currentType)
-            {
-                return false;
-            }
-
-            return requiredTypes.Contains(currentType);
-        }
-
-        /// <summary>
-        /// Determines whether provided file belongs to one of the provided list of files,
-        /// where list of files provided by string with Comma-Separated-Values of extensions
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="requiredTypes">The required types.</param>
-        /// <returns>
-        ///   <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool isFileOfTypes(this FileInfo file, String CSV)
-        {
-            List<FileType> providedTypes = GetFileTypesByExtensions(CSV);
-
-            return file.isFileOfTypes(providedTypes);
-        }
-
-        /// <summary>
-        /// Gets the list of FileTypes based on list of extensions in Comma-Separated-Values string
-        /// </summary>
-        /// <param name="CSV">The CSV String with extensions</param>
-        /// <returns>List of FileTypes</returns>
-        private static List<FileType> GetFileTypesByExtensions(String CSV)
-        {
-            String[] extensions = CSV.ToUpper().Replace(" ", "").Split(',');
-
-            List<FileType> result = new List<FileType>();
-
-            foreach (FileType type in types)
-            {
-                if (extensions.Contains(type.Extension.ToUpper()))
-                {
-                    result.Add(type);
-                }
-            }
-            return result;
-        }
-
         #endregion
 
         #region isType functions
