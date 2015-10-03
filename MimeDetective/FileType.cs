@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MN.Mime
+namespace MimeDetective
 {
     /// <summary>
     /// Little data structure to hold information about file types. 
@@ -59,19 +59,18 @@ namespace MN.Mime
 
         public override bool Equals(object other)
         {
-            if (!base.Equals(other)) return false;
-
             if (!(other is FileType)) return false;
 
             FileType otherType = (FileType)other;
 
-            if (this.Header != otherType.Header) return false;
-            if (this.HeaderOffset != otherType.HeaderOffset) return false;
-            if (this.Extension != otherType.Extension) return false;
-            if (this.Mime != otherType.Mime) return false;
+            if (this.Extension == otherType.Extension && this.Mime == otherType.Mime) return true;
 
+            return base.Equals(other);
+        }
 
-            return true;
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         public override string ToString()

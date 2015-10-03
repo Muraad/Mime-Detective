@@ -1,0 +1,193 @@
+﻿
+        /*
+        //ISO	 	ISO-9660 CD Disc Image
+        public readonly static FileType FLV = new FileType(new byte?[] { 0x46, 0x4C, 0x56, 0x01}, "flv", "application/unknown");
+
+
+        43 44 30 30 31	 	CD001
+
+        This signature usually occurs at byte offset 32769 (0x8001),
+        34817 (0x8801), or 36865 (0x9001).
+        More information can be found at MacTech or at ECMA.
+
+        */
+
+
+        /*
+        00 00 00 14 66 74 79 70
+        69 73 6F 6D	 	....ftyp
+        isom
+        MP4	 	ISO Base Media file (MPEG-4) v1
+
+        00 00 00 14 66 74 79 70
+        71 74 20 20	 	....ftyp
+        qt
+        MOV	 	QuickTime movie file
+
+        00 00 00 18 66 74 79 70
+        33 67 70 35	 	....ftyp
+        3gp5
+        MP4	 	MPEG-4 video files
+        video/mpeg
+        .m2a	audio/mpeg
+        .m2v	video/mpeg
+
+        00 00 00 18 66 74 79 70
+        6D 70 34 32	 	....ftyp
+        mp42
+        M4V	 	MPEG-4 video/QuickTime file
+
+        00 00 00 1C 66 74 79 70
+        4D 53 4E 56 01 29 00 46
+        4D 53 4E 56 6D 70 34 32	 	....ftyp
+        MSNV.).F
+        MSNVmp42
+        MP4	 	MPEG-4 video file
+
+        00 00 00 20 66 74 79 70
+        4D 34 41 20	 	... ftyp
+        M4A
+        M4A	 	Apple Lossless Audio Codec file
+
+        00 00 01 00	 	....
+        ICO	 	Windows icon file
+        SPL	 	Windows NT/2000/XP printer spool file
+
+        00 00 01 Bx	 	....
+        MPEG, MPG	 	MPEG video file
+        Trailer:
+        00 00 01 B7 (...·)
+
+        00 00 01 BA	 	....º
+        MPG, VOB	 	DVD Video Movie File (video/dvd, video/mpeg) or DVD MPEG2
+        Trailer:
+        00 00 01 B9 (...¹)
+
+
+        67 69 6d 70 20 78 63 66
+        20	 	gimp xcf
+        XCF	 	GNU Image Manipulation Program (GIMP) eXperimental Computing Facility (XCF)
+        image file
+
+        64 6E 73 2E	 	dns.
+        AU	 	Audacity audio file
+
+        66 49 00 00	 	fI..
+        SHD	 	Windows NT printer spool file
+
+        66 4C 61 43 00 00 00 22	 	fLaC..."
+        FLAC	 	Free Lossless Audio Codec file
+
+        [4 byte offset]
+        66 74 79 70 33 67 70 35	 	[4 byte offset]
+        ftyp3gp5
+        MP4	 	MPEG-4 video files
+
+        [4 byte offset]
+        66 74 79 70 4D 34 41 20	 	[4 byte offset]
+        ftypM4A
+        M4A	 	Apple Lossless Audio Codec file
+
+        [4 byte offset]
+        66 74 79 70 4D 53 4E 56	 	[4 byte offset]
+        ftypMSNV
+        MP4	 	MPEG-4 video file
+
+        [4 byte offset]
+        66 74 79 70 69 73 6F 6D	 	[4 byte offset]
+        ftypisom
+        MP4	 	ISO Base Media file (MPEG-4) v1
+
+        [4 byte offset]
+        66 74 79 70 6D 70 34 32	 	[4 byte offset]
+        ftypmp42
+        M4V	 	MPEG-4 video/QuickTime file
+
+        [4 byte offset]
+        66 74 79 70 71 74 20 20	 	[4 byte offset]
+        ftypqt
+
+
+        5F 27 A8 89	 	_'¨‰
+        JAR	 	Jar archive
+
+        50 4B 03 04 14 00 08 00
+        08 00	 	PK......
+        ..
+        JAR	 	Java archive
+
+        52 65 74 75 72 6E 2D 50
+        61 74 68 3A 20	 	Return-P
+        ath:
+        EML	 	A commmon file extension for e-mail files.
+
+
+
+        50 4B 03 04	 	PK..
+        ZIP	 	PKZIP archive file (Ref. 1 | Ref. 2)
+        Trailer: filename 50 4B 17 characters 00 00 00
+        Trailer: (filename PK 17 characters ...)
+        Note: PK are the initals of Phil Katz, co-creator of the ZIP file format and author of PKZIP.
+        ZIP	 	Apple Mac OS X Dashboard Widget, Aston Shell theme, Oolite eXpansion Pack,
+        Opera Widget, Pivot Style Template, Rockbox Theme package, Simple Machines
+        Forums theme, SubEthaEdit Mode, Trillian zipped skin, Virtual Skipper skin
+        JAR	 	Java archive; compressed file package for classes and data
+        KMZ	 	Google Earth saved working session file
+        KWD	 	KWord document
+        ODT, ODP, OTT	 	OpenDocument text document, presentation, and text document template, respectively.
+        SXC, SXD, SXI, SXW	 	OpenOffice spreadsheet (Calc), drawing (Draw), presentation (Impress),
+        and word processing (Writer) files, respectively.
+        SXC	 	StarOffice spreadsheet
+        WMZ	 	Windows Media compressed skin file
+        XPI	 	Mozilla Browser Archive
+        XPS	 	XML paper specification file
+        XPT	 	eXact Packager Models
+
+        application/x-compress
+        .z	application/x-compressed
+        .zip	application/x-compressed
+        .zip	application/x-zip-compressed
+        .zip	application/zip
+        .zip	multipart/x-zip
+
+
+        50 4B 03 04 0A 00 02 00	 	PK......
+        EPUB	 	Open Publication Structure eBook file. (Should also include the string:
+        mimetypeapplication/epub+zip)
+
+        50 4B 03 04 14 00 01 00
+        63 00 00 00 00 00	 	PK......
+        c.....
+        ZIP	 	ZLock Pro encrypted ZIP
+
+        50 4B 03 04 14 00 06 00	 	PK......
+        DOCX, PPTX, XLSX	 	Microsoft Office Open XML Format (OOXML) Document
+        NOTE: There is no subheader for MS OOXML files as there is with
+        DOC, PPT, and XLS files. To better understand the format of these files,
+        rename any OOXML file to have a .ZIP extension and then unZIP the file;
+        look at the resultant file named [Content_Types].xml to see the content
+        types. In particular, look for the <Override PartName= tag, where you
+        will find word, ppt, or xl, respectively.
+
+        Trailer: Look for 50 4B 05 06 (PK..) followed by 18 additional bytes
+        at the end of the file.
+
+        50 4B 03 04 14 00 08 00
+        08 00	 	PK......
+        ..
+        JAR	 	Java archive
+
+        50 4B 05 06	 	PK..
+        50 4B 07 08	 	PK..
+        ZIP	 	PKZIP empty and multivolume archive file, respectively
+
+        [30 byte offset]
+        50 4B 4C 49 54 45	 	[30 byte offset]
+        PKLITE
+        ZIP	 	PKLITE compressed ZIP archive (see also PKZIP)
+
+        [526 byte offset]
+        50 4B 53 70 58	 	[526 byte offset]
+        PKSFX
+        ZIP	 	PKSFX self-extracting executable compressed file (see also PKZIP)
+        */

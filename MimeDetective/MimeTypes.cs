@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace MN.Mime
+namespace MimeDetective
 {
     /// <summary>
     /// Helper class to identify file type by the file header, not file extension.
     /// </summary>
     public static class MimeTypes
     {
-
         // all the file types to be put into one list
         public static List<FileType> types;
 
@@ -18,7 +19,7 @@ namespace MN.Mime
         {
             types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
-                AES, SKR, SKR_2, PKR, EML_FROM, ELF};
+                AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE };
         }
 
         #region Constants
@@ -28,11 +29,18 @@ namespace MN.Mime
         //mime types are taken from here:
         //http://www.webmaster-toolkit.com/mime-types.shtml
 
-        #region office, excel, ppt and cocuments, xml, pdf, rtf, msdoc
+        #region office, excel, ppt and documents, xml, pdf, rtf, msdoc
         // office and documents
         public readonly static FileType WORD = new FileType(new byte?[] { 0xEC, 0xA5, 0xC1, 0x00 }, 512, "doc", "application/msword");
         public readonly static FileType EXCEL = new FileType(new byte?[] { 0x09, 0x08, 0x10, 0x00, 0x00, 0x06, 0x05, 0x00 }, 512, "xls", "application/excel");
         public readonly static FileType PPT = new FileType(new byte?[] { 0xFD, 0xFF, 0xFF, 0xFF, null, 0x00, 0x00, 0x00 }, 512, "ppt", "application/mspowerpoint");
+
+        //ms office and openoffice docs (they're zip files: rename and enjoy!)
+        //don't add them to the list, as they will be 'subtypes' of the ZIP type
+        public readonly static FileType WORDX = new FileType(new byte?[0], 512, "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        public readonly static FileType EXCELX = new FileType(new byte?[0], 512, "xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        public readonly static FileType ODT = new FileType(new byte?[0], 512, "odt", "application/vnd.oasis.opendocument.text");
+        public readonly static FileType ODS = new FileType(new byte?[0], 512, "ods", "application/vnd.oasis.opendocument.spreadsheet");
 
         // common documents
         public readonly static FileType RTF = new FileType(new byte?[] { 0x7B, 0x5C, 0x72, 0x74, 0x66, 0x31 }, "rtf", "application/rtf");
@@ -41,6 +49,14 @@ namespace MN.Mime
         //application/xml text/xml
         public readonly static FileType XML = new FileType(new byte?[] { 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x3D, 0x22, 0x31, 0x2E, 0x30, 0x22, 0x3F, 0x3E },
                                                             "xml,xul", "text/xml");
+
+        //text files
+        public readonly static FileType TXT = new FileType(new byte?[0], "txt", "text/plain");
+        public readonly static FileType TXT_UTF8 = new FileType(new byte?[] { 0xEF, 0xBB, 0xBF }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF16_BE = new FileType(new byte?[] { 0xFE, 0xFF }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF16_LE = new FileType(new byte?[] { 0xFF, 0xFE }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF32_BE = new FileType(new byte?[] { 0x00, 0x00, 0xFE, 0xFF }, "txt", "text/plain");
+        public readonly static FileType TXT_UTF32_LE = new FileType(new byte?[] { 0xFF, 0xFE, 0x00, 0x00 }, "txt", "text/plain");
 
         #endregion
 
@@ -91,6 +107,7 @@ namespace MN.Mime
         public readonly static FileType FLV = new FileType(new byte?[] { 0x46, 0x4C, 0x56, 0x01 }, "flv", "application/unknown");
 
         //WAV	 	Resource Interchange File Format -- Audio for Windows file, where xx xx xx xx is the file size (little endian), audio/wav audio/x-wav
+
         public readonly static FileType WAVE = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null, 
                                                             0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20	}, "wav", "audio/wav");
 
@@ -105,7 +122,7 @@ namespace MN.Mime
         #endregion
 
         public readonly static FileType LIB_COFF = new FileType(new byte?[] { 0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E, 0x0A }, "lib", "application/octet-stream");
- 
+
         #region Crypto aes, skr, skr_2, pkr
 
         //AES Crypt file format. (The fourth byte is the version number.)
@@ -120,7 +137,7 @@ namespace MN.Mime
         //PKR	 	PGP public keyring file
         public readonly static FileType PKR = new FileType(new byte?[] { 0x99, 0x01 }, "pkr", "application/octet-stream");
 
-        
+
         #endregion
 
         /*
@@ -137,204 +154,10 @@ namespace MN.Mime
         //EVTX	 	Windows Vista event log file
         public readonly static FileType ELF = new FileType(new byte?[] { 0x45, 0x6C, 0x66, 0x46, 0x69, 0x6C, 0x65, 0x00 }, "elf", "text/plain");
 
-        /*
-        //ISO	 	ISO-9660 CD Disc Image
-        public readonly static FileType FLV = new FileType(new byte?[] { 0x46, 0x4C, 0x56, 0x01}, "flv", "application/unknown");
-
-
-        43 44 30 30 31	 	CD001
-
-        This signature usually occurs at byte offset 32769 (0x8001),
-        34817 (0x8801), or 36865 (0x9001).
-        More information can be found at MacTech or at ECMA.
-
-        */
-
-
-        /*
-        00 00 00 14 66 74 79 70
-        69 73 6F 6D	 	....ftyp
-        isom
-        MP4	 	ISO Base Media file (MPEG-4) v1
-
-        00 00 00 14 66 74 79 70
-        71 74 20 20	 	....ftyp
-        qt
-        MOV	 	QuickTime movie file
-
-        00 00 00 18 66 74 79 70
-        33 67 70 35	 	....ftyp
-        3gp5
-        MP4	 	MPEG-4 video files
-        video/mpeg
-        .m2a	audio/mpeg
-        .m2v	video/mpeg
-
-        00 00 00 18 66 74 79 70
-        6D 70 34 32	 	....ftyp
-        mp42
-        M4V	 	MPEG-4 video/QuickTime file
-
-        00 00 00 1C 66 74 79 70
-        4D 53 4E 56 01 29 00 46
-        4D 53 4E 56 6D 70 34 32	 	....ftyp
-        MSNV.).F
-        MSNVmp42
-        MP4	 	MPEG-4 video file
-
-        00 00 00 20 66 74 79 70
-        4D 34 41 20	 	... ftyp
-        M4A
-        M4A	 	Apple Lossless Audio Codec file
-
-        00 00 01 00	 	....
-        ICO	 	Windows icon file
-        SPL	 	Windows NT/2000/XP printer spool file
-
-        00 00 01 Bx	 	....
-        MPEG, MPG	 	MPEG video file
-        Trailer:
-        00 00 01 B7 (...·)
-
-        00 00 01 BA	 	....º
-        MPG, VOB	 	DVD Video Movie File (video/dvd, video/mpeg) or DVD MPEG2
-        Trailer:
-        00 00 01 B9 (...¹)
-
-
-        67 69 6d 70 20 78 63 66
-        20	 	gimp xcf
-        XCF	 	GNU Image Manipulation Program (GIMP) eXperimental Computing Facility (XCF)
-        image file
-
-        64 6E 73 2E	 	dns.
-        AU	 	Audacity audio file
-
-        66 49 00 00	 	fI..
-        SHD	 	Windows NT printer spool file
-
-        66 4C 61 43 00 00 00 22	 	fLaC..."
-        FLAC	 	Free Lossless Audio Codec file
-
-        [4 byte offset]
-        66 74 79 70 33 67 70 35	 	[4 byte offset]
-        ftyp3gp5
-        MP4	 	MPEG-4 video files
-
-        [4 byte offset]
-        66 74 79 70 4D 34 41 20	 	[4 byte offset]
-        ftypM4A
-        M4A	 	Apple Lossless Audio Codec file
-
-        [4 byte offset]
-        66 74 79 70 4D 53 4E 56	 	[4 byte offset]
-        ftypMSNV
-        MP4	 	MPEG-4 video file
-
-        [4 byte offset]
-        66 74 79 70 69 73 6F 6D	 	[4 byte offset]
-        ftypisom
-        MP4	 	ISO Base Media file (MPEG-4) v1
-
-        [4 byte offset]
-        66 74 79 70 6D 70 34 32	 	[4 byte offset]
-        ftypmp42
-        M4V	 	MPEG-4 video/QuickTime file
-
-        [4 byte offset]
-        66 74 79 70 71 74 20 20	 	[4 byte offset]
-        ftypqt
-
-
-        5F 27 A8 89	 	_'¨‰
-        JAR	 	Jar archive
-
-        50 4B 03 04 14 00 08 00
-        08 00	 	PK......
-        ..
-        JAR	 	Java archive
-
-        52 65 74 75 72 6E 2D 50
-        61 74 68 3A 20	 	Return-P
-        ath:
-        EML	 	A commmon file extension for e-mail files.
-
-
-
-        50 4B 03 04	 	PK..
-        ZIP	 	PKZIP archive file (Ref. 1 | Ref. 2)
-        Trailer: filename 50 4B 17 characters 00 00 00
-        Trailer: (filename PK 17 characters ...)
-        Note: PK are the initals of Phil Katz, co-creator of the ZIP file format and author of PKZIP.
-        ZIP	 	Apple Mac OS X Dashboard Widget, Aston Shell theme, Oolite eXpansion Pack,
-        Opera Widget, Pivot Style Template, Rockbox Theme package, Simple Machines
-        Forums theme, SubEthaEdit Mode, Trillian zipped skin, Virtual Skipper skin
-        JAR	 	Java archive; compressed file package for classes and data
-        KMZ	 	Google Earth saved working session file
-        KWD	 	KWord document
-        ODT, ODP, OTT	 	OpenDocument text document, presentation, and text document template, respectively.
-        SXC, SXD, SXI, SXW	 	OpenOffice spreadsheet (Calc), drawing (Draw), presentation (Impress),
-        and word processing (Writer) files, respectively.
-        SXC	 	StarOffice spreadsheet
-        WMZ	 	Windows Media compressed skin file
-        XPI	 	Mozilla Browser Archive
-        XPS	 	XML paper specification file
-        XPT	 	eXact Packager Models
-
-        application/x-compress
-        .z	application/x-compressed
-        .zip	application/x-compressed
-        .zip	application/x-zip-compressed
-        .zip	application/zip
-        .zip	multipart/x-zip
-
-
-        50 4B 03 04 0A 00 02 00	 	PK......
-        EPUB	 	Open Publication Structure eBook file. (Should also include the string:
-        mimetypeapplication/epub+zip)
-
-        50 4B 03 04 14 00 01 00
-        63 00 00 00 00 00	 	PK......
-        c.....
-        ZIP	 	ZLock Pro encrypted ZIP
-
-        50 4B 03 04 14 00 06 00	 	PK......
-        DOCX, PPTX, XLSX	 	Microsoft Office Open XML Format (OOXML) Document
-        NOTE: There is no subheader for MS OOXML files as there is with
-        DOC, PPT, and XLS files. To better understand the format of these files,
-        rename any OOXML file to have a .ZIP extension and then unZIP the file;
-        look at the resultant file named [Content_Types].xml to see the content
-        types. In particular, look for the <Override PartName= tag, where you
-        will find word, ppt, or xl, respectively.
-
-        Trailer: Look for 50 4B 05 06 (PK..) followed by 18 additional bytes
-        at the end of the file.
-
-        50 4B 03 04 14 00 08 00
-        08 00	 	PK......
-        ..
-        JAR	 	Java archive
-
-        50 4B 05 06	 	PK..
-        50 4B 07 08	 	PK..
-        ZIP	 	PKZIP empty and multivolume archive file, respectively
-
-        [30 byte offset]
-        50 4B 4C 49 54 45	 	[30 byte offset]
-        PKLITE
-        ZIP	 	PKLITE compressed ZIP archive (see also PKZIP)
-
-        [526 byte offset]
-        50 4B 53 70 58	 	[526 byte offset]
-        PKSFX
-        ZIP	 	PKSFX self-extracting executable compressed file (see also PKZIP)
-        */
-
         // number of bytes we read from a file
         public const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
 
-        
-
+       
         #endregion
 
         #region Main Methods
@@ -360,6 +183,60 @@ namespace MN.Mime
         }
 
         /// <summary>
+        /// Read header of bytes and depending on the information in the header
+        /// return object FileType.
+        /// Return null in case when the file type is not identified. 
+        /// Throws Application exception if the file can not be read or does not exist
+        /// </summary>
+        /// <param name="file">The FileInfo object.</param>
+        /// <returns>FileType or null not identified</returns>
+        public static FileType GetFileType(this byte[] bytes)
+        {
+            FileType fileType = null;
+            var fileName = Path.GetTempFileName();
+
+            try
+            {
+                File.WriteAllBytes(fileName, bytes);
+                fileType = GetFileType(new FileInfo(fileName));
+            }
+            finally
+            {
+                File.Delete(fileName);
+            }
+            return fileType;
+        }
+
+        /// <summary>
+        /// Read header of a stream and depending on the information in the header
+        /// return object FileType.
+        /// Return null in case when the file type is not identified. 
+        /// Throws Application exception if the file can not be read or does not exist
+        /// </summary>
+        /// <param name="file">The FileInfo object.</param>
+        /// <returns>FileType or null not identified</returns>
+        public static FileType GetFileType(this Stream stream)
+        {
+            FileType fileType = null;
+            var fileName = Path.GetTempFileName();
+
+            try
+            {
+                using (var fileStream = File.Create(fileName))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    stream.CopyTo(fileStream);
+                }
+                fileType = GetFileType(new FileInfo(fileName));
+            }
+            finally
+            {
+                File.Delete(fileName);
+            }
+            return fileType;
+        }
+
+        /// <summary>
         /// Read header of a file and depending on the information in the header
         /// return object FileType.
         /// Return null in case when the file type is not identified. 
@@ -369,8 +246,7 @@ namespace MN.Mime
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this FileInfo file)
         {
-            // read first n-bytes from the file
-            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize));
+            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize), file.FullName);
         }
 
         /// <summary>
@@ -380,39 +256,103 @@ namespace MN.Mime
         /// Throws Application exception if the file can not be read or does not exist
         /// </summary>
         /// <param name="fileHeaderReadFunc">A function which returns the bytes found</param>
+        /// <param name="fileFullName">If given and file typ is a zip file, a check for docx and xlsx is done</param>
         /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc)
+        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc, string fileFullName = "")
         {
-            // read first n-bytes from the file
-            Byte[] fileHeader = fileHeaderReadFunc();
+            // if none of the types match, return null
+            FileType fileType = null;
 
-            // compare the file header to the stored file headers
-            foreach (FileType type in types)
+            // read first n-bytes from the file
+            byte[] fileHeader = fileHeaderReadFunc();
+
+            // checking if it's binary (not really exact, but should do the job)
+            // shouldn't work with UTF-16 OR UTF-32 files
+            if (!fileHeader.Any(b => b == 0))
             {
-                int matchingCount = 0;
-                for (int i = 0; i < type.Header.Length; i++)
+                fileType = TXT;
+            }
+            else
+            {
+                // compare the file header to the stored file headers
+                foreach (FileType type in types)
                 {
-                    // if file offset is not set to zero, we need to take this into account when comparing.
-                    // if byte in type.header is set to null, means this byte is variable, ignore it
-                    if (type.Header[i] != null && type.Header[i] != fileHeader[i + type.HeaderOffset])
+                    int matchingCount = GetFileMatchingCount(fileHeader, type);
+                    if (matchingCount == type.Header.Length)
                     {
-                        // if one of the bytes does not match, move on to the next type
-                        matchingCount = 0;
+                        // check for docx and xlsx only if a file name is given
+                        // there may be situations where the file name is not given
+                        // or it is unpracticable to write a temp file to get the FileInfo
+                        if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
+                            fileType = CheckForDocxAndXlsx(type, fileFullName);
+                        else
+                            fileType = type;    // if all the bytes match, return the type
+
                         break;
                     }
-                    else
-                    {
-                        matchingCount++;
-                    }
-                }
-                if (matchingCount == type.Header.Length)
-                {
-                    // if all the bytes match, return the type
-                    return type;
                 }
             }
-            // if none of the types match, return null
-            return null;
+            return fileType;
+        }
+
+
+        private static FileType CheckForDocxAndXlsx(FileType type, string fileFullName)
+        {
+            FileType result = null;
+
+            //check for docx and xlsx
+            using (var zipFile = ZipFile.OpenRead(fileFullName))
+            {
+                if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
+                    result = WORDX;
+                else if (zipFile.Entries.Any(e => e.FullName.StartsWith("xl/")))
+                    result = EXCELX;
+                else
+                    result = CheckForOdtAndOds(result, zipFile);
+            }
+            return result;
+        }
+
+        private static FileType CheckForOdtAndOds(FileType result, ZipArchive zipFile)
+        {
+            var ooMimeType = zipFile.Entries.FirstOrDefault(e => e.FullName == "mimetype");
+            if (ooMimeType != null)
+            {
+                using (var textReader = new StreamReader(ooMimeType.Open()))
+                {
+                    var mimeType = textReader.ReadToEnd();
+                    textReader.Close();
+
+                    if (mimeType == ODT.Mime)
+                        result = ODT;
+                    else if (mimeType == ODS.Mime)
+                        result = ODS;
+                }
+            }
+
+            return result;
+        }
+
+        private static int GetFileMatchingCount(byte[] fileHeader, FileType type)
+        {
+            int matchingCount = 0;
+            for (int i = 0; i < type.Header.Length; i++)
+            {
+                // if file offset is not set to zero, we need to take this into account when comparing.
+                // if byte in type.header is set to null, means this byte is variable, ignore it
+                if (type.Header[i] != null && type.Header[i] != fileHeader[i + type.HeaderOffset])
+                {
+                    // if one of the bytes does not match, move on to the next type
+                    matchingCount = 0;
+                    break;
+                }
+                else
+                {
+                    matchingCount++;
+                }
+            }
+
+            return matchingCount;
         }
 
         /// <summary>
