@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MimeDetective
+namespace MN.Mime
 {
     /// <summary>
     /// Little data structure to hold information about file types. 

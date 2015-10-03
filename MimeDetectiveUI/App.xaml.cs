@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MimeDetective
+namespace MN.Mime
 {
     /// <summary>
     /// Interaction logic for App.xaml

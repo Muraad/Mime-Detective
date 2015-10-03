@@ -30,7 +30,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace MimeDetective
+namespace MN.Mime
 {
     /// <summary>
     /// Interaction logic for LoginWindow.xaml

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MimeDetective.Properties {
+namespace MN.Mime.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

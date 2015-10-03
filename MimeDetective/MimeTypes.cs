@@ -5,7 +5,7 @@ using System.Linq;
 
 using System.Threading.Tasks;
 
-namespace MimeDetective
+namespace MN.Mime
 {
     /// <summary>
     /// Helper class to identify file type by the file header, not file extension.
@@ -350,7 +350,9 @@ namespace MimeDetective
             using (FileStream file = File.OpenRead(path))
             {
                 var serializer = new System.Xml.Serialization.XmlSerializer(types.GetType());
-                types = (List<FileType>)serializer.Deserialize(file);
+                List<FileType> tmpTypes = (List<FileType>)serializer.Deserialize(file);
+                foreach (var type in tmpTypes)
+                    types.Add(type);
             }
         }
         /// <summary>

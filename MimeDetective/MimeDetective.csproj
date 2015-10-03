@@ -7,7 +7,7 @@
     <ProjectGuid>{808E29FE-EF7A-4B04-858B-414238956BC3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MimeDetective</RootNamespace>
+    <RootNamespace>MN.Mime</RootNamespace>
     <AssemblyName>MimeDetective</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

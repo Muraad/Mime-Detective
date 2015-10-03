@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
-namespace MimeDetective
+namespace MN.Mime
 {
     public class MimeDetective
     {

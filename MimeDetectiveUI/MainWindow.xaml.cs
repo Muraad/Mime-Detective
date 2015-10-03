@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 
 using System.IO;
 
-namespace MimeDetective
+namespace MN.Mime
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

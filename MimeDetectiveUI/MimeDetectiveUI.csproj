@@ -7,7 +7,7 @@
     <ProjectGuid>{309658F5-662C-463B-B7CB-A173C29537D2}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MimeDetective</RootNamespace>
+    <RootNamespace>MN.Mime</RootNamespace>
     <AssemblyName>MimeDetectiveUI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
