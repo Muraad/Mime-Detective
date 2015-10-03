@@ -156,7 +156,6 @@ namespace MimeDetective
 
         // number of bytes we read from a file
         public const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
-
        
         #endregion
 
@@ -199,19 +198,7 @@ namespace MimeDetective
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this byte[] bytes)
         {
-            FileType fileType = null;
-            var fileName = Path.GetTempFileName();
-
-            try
-            {
-                File.WriteAllBytes(fileName, bytes);
-                fileType = GetFileType(new FileInfo(fileName));
-            }
-            finally
-            {
-                File.Delete(fileName);
-            }
-            return fileType;
+            return GetFileType(new MemoryStream(bytes));
         }
 
         /// <summary>
