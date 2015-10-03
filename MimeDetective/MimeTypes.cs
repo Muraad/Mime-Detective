@@ -14,9 +14,14 @@ namespace MimeDetective
     {
 
         // all the file types to be put into one list
-        public static List<FileType> types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
+        public static List<FileType> types;
+
+        static MimeTypes()
+        {
+            types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF};
+        }
 
         #region Constants
 
@@ -328,7 +333,7 @@ namespace MimeDetective
         */
 
         // number of bytes we read from a file
-        private const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
+        public const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
 
         
 
@@ -353,6 +358,7 @@ namespace MimeDetective
                 types = (List<FileType>)serializer.Deserialize(file);
             }
         }
+
         /// <summary>
         /// Read header of a file and depending on the information in the header
         /// return object FileType.
@@ -364,7 +370,21 @@ namespace MimeDetective
         public static FileType GetFileType(this FileInfo file)
         {
             // read first n-bytes from the file
-            Byte[] fileHeader = ReadFileHeader(file, MaxHeaderSize);
+            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize));
+        }
+
+        /// <summary>
+        /// Read header of a file and depending on the information in the header
+        /// return object FileType.
+        /// Return null in case when the file type is not identified. 
+        /// Throws Application exception if the file can not be read or does not exist
+        /// </summary>
+        /// <param name="fileHeaderReadFunc">A function which returns the bytes found</param>
+        /// <returns>FileType or null not identified</returns>
+        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc)
+        {
+            // read first n-bytes from the file
+            Byte[] fileHeader = fileHeaderReadFunc();
 
             // compare the file header to the stored file headers
             foreach (FileType type in types)
