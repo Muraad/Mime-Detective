@@ -453,44 +453,6 @@ namespace MimeDetective
         }
 
         /// <summary>
-        /// Determines whether the specified file is PDF.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file is PDF; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsPdf(this FileInfo file)
-        {
-            return file.IsType(PDF);
-        }
-
-
-        /// <summary>
-        /// Determines whether the specified file info is ms-word document file
-        /// </summary>
-        /// <param name="fileInfo">The file info.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file info is doc; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsWord(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(WORD);
-        }
-
-
-        /// <summary>
-        /// Determines whether the specified file is zip archive
-        /// </summary>
-        /// <param name="fileInfo">The file info.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file info is zip; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsZip(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(ZIP);
-        }
-
-        /// <summary>
         /// Determines whether the specified file is MS Excel spreadsheet
         /// </summary>
         /// <param name="fileInfo">The FileInfo</param>
@@ -500,55 +462,7 @@ namespace MimeDetective
         public static bool IsExcel(this FileInfo fileInfo)
         {
             return fileInfo.IsType(EXCEL);
-        }
-
-        /// <summary>
-        /// Determines whether the specified file is JPEG image
-        /// </summary>
-        /// <param name="fileInfo">The FileInfo.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file info is JPEG; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsJpeg(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(JPEG);
-        }
-
-        /// <summary>
-        /// Determines whether the specified file is RAR-archive.
-        /// </summary>
-        /// <param name="fileInfo">The FileInfo.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file info is RAR; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsRar(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(RAR);
-        }
-
-        /// <summary>
-        /// Determines whether the specified file is RTF document.
-        /// </summary>
-        /// <param name="fileInfo">The FileInfo.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file is RTF; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsRtf(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(RTF);
-        }
-
-        /// <summary>
-        /// Determines whether the specified file is PNG.
-        /// </summary>
-        /// <param name="fileInfo">The FileInfo object</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file info is PNG; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsPng(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(PNG);
-        }
+        } 
 
         /// <summary>
         /// Determines whether the specified file is Microsoft PowerPoint Presentation
@@ -563,19 +477,6 @@ namespace MimeDetective
         }
 
         /// <summary>
-        /// Determines whether the specified file is GIF image
-        /// </summary>
-        /// <param name="fileInfo">The FileInfo object</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file info is GIF; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsGif(this FileInfo fileInfo)
-        {
-            return fileInfo.IsType(GIF);
-        }
-
-
-        /// <summary>
         /// Checks if the file is executable
         /// </summary>
         /// <param name="fileInfo"></param>
@@ -584,7 +485,6 @@ namespace MimeDetective
         {
             return fileInfo.IsType(DLL_EXE);
         }
-
 
         /// <summary>
         /// Check if the file is Microsoft Installer.
