@@ -148,7 +148,7 @@ namespace MimeDetective
         are for Netscape, Eudora, and a generic signature, respectively.
         EML is also used by Outlook Express and QuickMail.
          */
-        public readonly static FileType EML_FROM = new FileType(new byte?[] { 0x4D, 0x54, 0x68, 0x64 }, "midi,mid", "audio/midi");
+        public readonly static FileType EML_FROM = new FileType(new byte?[] { 0x46, 0x72, 0x6F, 0x6D }, "eml", "message/rfc822");
 
 
         //EVTX	 	Windows Vista event log file
