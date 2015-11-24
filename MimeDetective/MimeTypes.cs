@@ -179,69 +179,7 @@ namespace MimeDetective
                 foreach (var type in tmpTypes)
                     types.Add(type);
             }
-        }
-
-        /// <summary>
-        /// Read header of bytes and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
-        /// </summary>
-        /// <remarks>
-        /// A temp file is written to get a FileInfo from the given bytes.
-        /// If this is not intended use 
-        /// 
-        ///     GetFileType(() => bytes); 
-        ///     
-        /// </remarks>
-        /// <param name="file">The FileInfo object.</param>
-        /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(this byte[] bytes)
-        {
-            return GetFileType(new MemoryStream(bytes));
-        }
-
-        /// <summary>
-        /// Read header of a stream and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
-        /// </summary>
-        /// <param name="file">The FileInfo object.</param>
-        /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(this Stream stream)
-        {
-            FileType fileType = null;
-            var fileName = Path.GetTempFileName();
-
-            try
-            {
-                using (var fileStream = File.Create(fileName))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
-                }
-                fileType = GetFileType(new FileInfo(fileName));
-            }
-            finally
-            {
-                File.Delete(fileName);
-            }
-            return fileType;
-        }
-
-        /// <summary>
-        /// Read header of a file and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
-        /// </summary>
-        /// <param name="file">The FileInfo object.</param>
-        /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(this FileInfo file)
-        {
-            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize), file.FullName);
-        }
+        } 
 
         /// <summary>
         /// Read header of a file and depending on the information in the header
@@ -410,7 +348,7 @@ namespace MimeDetective
         /// </summary>
         /// <param name="file">The file to work with</param>
         /// <returns>Array of bytes</returns>
-        private static Byte[] ReadFileHeader(FileInfo file, int MaxHeaderSize)
+        internal static Byte[] ReadFileHeader(FileInfo file)
         {
             Byte[] header = new byte[MaxHeaderSize];
             try  // read file
@@ -431,26 +369,7 @@ namespace MimeDetective
         }
         #endregion
 
-        #region isType functions
-
-
-        /// <summary>
-        /// Determines whether the specified file is of provided type
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="type">The FileType</param>
-        /// <returns>
-        ///   <c>true</c> if the specified file is type; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsType(this FileInfo file, FileType type)
-        {
-            FileType actualType = GetFileType(file);
-
-            if (null == actualType)
-                return false;
-
-            return (actualType.Equals(type));
-        }
+        #region isType functions 
 
         /// <summary>
         /// Determines whether the specified file is MS Excel spreadsheet
