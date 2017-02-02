@@ -108,8 +108,8 @@ namespace MimeDetective
 
         //WAV	 	Resource Interchange File Format -- Audio for Windows file, where xx xx xx xx is the file size (little endian), audio/wav audio/x-wav
 
-        public readonly static FileType WAVE = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null, 
-                                                            0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20	}, "wav", "audio/wav");
+        public readonly static FileType WAVE = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46, null, null, null, null,
+                                                            0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20  }, "wav", "audio/wav");
 
         public readonly static FileType PST = new FileType(new byte?[] { 0x21, 0x42, 0x44, 0x4E }, "pst", "application/octet-stream");
 
@@ -156,7 +156,7 @@ namespace MimeDetective
 
         // number of bytes we read from a file
         public const int MaxHeaderSize = 560;  // some file formats have headers offset to 512 bytes
-       
+
         #endregion
 
         #region Main Methods
@@ -277,8 +277,15 @@ namespace MimeDetective
                         // check for docx and xlsx only if a file name is given
                         // there may be situations where the file name is not given
                         // or it is unpracticable to write a temp file to get the FileInfo
-                        if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
+                        if (type.Equals(ZIP) && !string.IsNullOrEmpty(fileFullName))
                             fileType = CheckForDocxAndXlsx(type, fileFullName);
+
+                        // If the file hasn't been injected, use from the memory 
+                        else if (type.Equals(ZIP))
+                        {
+                            Stream fileStream = new MemoryStream(fileHeader);
+                            fileType = CheckForDocxAndXlsx(new ZipArchive(fileStream));
+                        }
                         else
                             fileType = type;    // if all the bytes match, return the type
 
@@ -360,6 +367,27 @@ namespace MimeDetective
                 else
                     result = CheckForOdtAndOds(result, zipFile);
             }
+            return result;
+        }
+
+        /// <summary>
+        /// Check for Docx and XLSx from a ZipArchive instead of file full name.
+        /// </summary>
+        /// <param name="zipFile">ZipArchive file</param>
+        /// <returns></returns>
+        private static FileType CheckForDocxAndXlsx(ZipArchive zipFile)
+        {
+            FileType result = null;
+
+            if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
+                result = WORDX;
+
+            else if (zipFile.Entries.Any(e => e.FullName.StartsWith("xl/")))
+                result = EXCELX;
+
+            else
+                result = CheckForOdtAndOds(result, zipFile);
+
             return result;
         }
 
@@ -462,7 +490,7 @@ namespace MimeDetective
         public static bool IsExcel(this FileInfo fileInfo)
         {
             return fileInfo.IsType(EXCEL);
-        } 
+        }
 
         /// <summary>
         /// Determines whether the specified file is Microsoft PowerPoint Presentation
