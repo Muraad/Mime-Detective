@@ -260,32 +260,31 @@ namespace MimeDetective
             // read first n-bytes from the file
             byte[] fileHeader = fileHeaderReadFunc();
 
+            // compare the file header to the stored file headers
+            foreach (FileType type in types)
+            {
+                int matchingCount = GetFileMatchingCount(fileHeader, type);
+                if (matchingCount == type.Header.Length)
+                {
+                    // check for docx and xlsx only if a file name is given
+                    // there may be situations where the file name is not given
+                    // or it is unpracticable to write a temp file to get the FileInfo
+                    if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
+                        fileType = CheckForDocxAndXlsx(type, fileFullName);
+                    else
+                        fileType = type;    // if all the bytes match, return the type
+
+                    break;
+                }
+            }
+
             // checking if it's binary (not really exact, but should do the job)
             // shouldn't work with UTF-16 OR UTF-32 files
-            if (!fileHeader.Any(b => b == 0))
+            if (fileType == null && !fileHeader.Any(b => b == 0))
             {
                 fileType = TXT;
             }
-            else
-            {
-                // compare the file header to the stored file headers
-                foreach (FileType type in types)
-                {
-                    int matchingCount = GetFileMatchingCount(fileHeader, type);
-                    if (matchingCount == type.Header.Length)
-                    {
-                        // check for docx and xlsx only if a file name is given
-                        // there may be situations where the file name is not given
-                        // or it is unpracticable to write a temp file to get the FileInfo
-                        if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
-                            fileType = CheckForDocxAndXlsx(type, fileFullName);
-                        else
-                            fileType = type;    // if all the bytes match, return the type
 
-                        break;
-                    }
-                }
-            }
             return fileType;
         }
 
