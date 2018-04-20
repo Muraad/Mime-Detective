@@ -17,7 +17,7 @@ namespace MimeDetective
 
         static MimeTypes()
         {
-            types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
+            types = new List<FileType> {PDF, WORD, EXCEL, JPEG, TIFF, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
                 BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE };
         }
@@ -68,8 +68,9 @@ namespace MimeDetective
         public readonly static FileType GIF = new FileType(new byte?[] { 0x47, 0x49, 0x46, 0x38, null, 0x61 }, "gif", "image/gif");
         public readonly static FileType BMP = new FileType(new byte?[] { 66, 77 }, "bmp", "image/gif");
         public readonly static FileType ICO = new FileType(new byte?[] { 0, 0, 1, 0 }, "ico", "image/x-icon");
-
+        public readonly static FileType TIFF = new FileType(new byte?[] { 0x4D, 0x4D }, "tif", "image/tiff");
         #endregion
+
 
         //bmp, tiff
         #region Zip, 7zip, rar, dll_exe, tar, bz2, gz_tgz
