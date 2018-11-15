@@ -18,7 +18,9 @@ namespace MimeDetective
         static MimeTypes()
         {
             types = new List<FileType> {PDF, WORD, EXCEL, JPEG, ZIP, RAR, RTF, PNG, PPT, GIF, DLL_EXE, MSDOC,
-                BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO, XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
+                BMP, DLL_EXE, ZIP_7z, ZIP_7z_2, GZ_TGZ, TAR_ZH, TAR_ZV, OGG, ICO,
+				AVI, WMV, MOV, MP4, M3GP, M3GP_2, MPG, MPG_DVD,
+				XML, MIDI, FLV, WAVE, DWG, LIB_COFF, PST, PSD,
                 AES, SKR, SKR_2, PKR, EML_FROM, ELF, TXT_UTF8, TXT_UTF16_BE, TXT_UTF16_LE, TXT_UTF32_BE, TXT_UTF32_LE };
         }
 
@@ -69,12 +71,26 @@ namespace MimeDetective
         public readonly static FileType BMP = new FileType(new byte?[] { 66, 77 }, "bmp", "image/gif");
         public readonly static FileType ICO = new FileType(new byte?[] { 0, 0, 1, 0 }, "ico", "image/x-icon");
 
-        #endregion
+		#endregion
 
-        //bmp, tiff
-        #region Zip, 7zip, rar, dll_exe, tar, bz2, gz_tgz
+		// video
+		#region Video formats
 
-        public readonly static FileType GZ_TGZ = new FileType(new byte?[] { 0x1F, 0x8B, 0x08 }, "gz, tgz", "application/x-gz");
+		public readonly static FileType AVI = new FileType(new byte?[] { 0x52, 0x49, 0x46, 0x46 }, "avi", "video/x-msvideo");
+		public readonly static FileType WMV = new FileType(new byte?[] { 0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11 }, "wmv", "video/x-ms-wmv");
+		public readonly static FileType MOV = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, 0x71, 0x74 }, "mov", "video/quicktime");
+		public readonly static FileType MP4 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70 }, "mp4", "video/mp4");
+		public readonly static FileType M3GP = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70 }, "3gp", "video/3gpp");
+		public readonly static FileType M3GP_2 = new FileType(new byte?[] { 0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70 }, "3gp", "video/3gpp");
+		public readonly static FileType MPG = new FileType(new byte?[] { 0x00, 0x00, 0x01, 0xB3 }, "mpg", "video/mpeg");
+		public readonly static FileType MPG_DVD = new FileType(new byte?[] { 0x00, 0x00, 0x01, 0xBA }, "mpg", "video/mpeg");
+
+		#endregion
+
+		//bmp, tiff
+		#region Zip, 7zip, rar, dll_exe, tar, bz2, gz_tgz
+
+		public readonly static FileType GZ_TGZ = new FileType(new byte?[] { 0x1F, 0x8B, 0x08 }, "gz, tgz", "application/x-gz");
 
         public readonly static FileType ZIP_7z = new FileType(new byte?[] { 66, 77 }, "7z", "application/x-compressed");
         public readonly static FileType ZIP_7z_2 = new FileType(new byte?[] { 0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C }, "7z", "application/x-compressed");
